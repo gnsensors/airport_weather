@@ -103,6 +103,18 @@
             cursor: not-allowed;
             transform: none;
         }
+        .stats-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .stats-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .stats-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -121,6 +133,9 @@
         <div class="loading" id="loading">
             <div class="spinner"></div>
             <p>Fetching weather data... (this may take a few seconds)</p>
+        </div>
+        <div class="stats-link">
+            <a href="/stats">📊 View Statistics</a>
         </div>
     </div>
     <script>
