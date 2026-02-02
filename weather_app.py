@@ -112,4 +112,8 @@ def get_weather():
         return render_template('index.html', error=error)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Get port from environment variable (Railway/Docker) or default to 5000
+    port = int(os.environ.get('PORT', 5000))
+    # Set debug to False in production
+    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug, host='0.0.0.0', port=port)

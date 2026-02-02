@@ -50,6 +50,35 @@ http://localhost:5000
 
 3. Enter a city name and click "Get Weather" to see current weather information.
 
+## Docker Deployment
+
+### Build and Run with Docker
+
+1. Build the Docker image:
+```bash
+docker build -t airport-weather .
+```
+
+2. Run the container:
+```bash
+docker run -p 5000:5000 airport-weather
+```
+
+3. Access at `http://localhost:5000`
+
+### Deploy to Railway.com
+
+1. Push your code to GitHub (already done!)
+2. Go to [Railway.app](https://railway.app) and sign in
+3. Click "New Project" → "Deploy from GitHub repo"
+4. Select `gnsensors/airport_weather`
+5. Railway will automatically detect the Dockerfile and deploy
+6. Your app will be live at a Railway-provided URL!
+
+**Railway Environment Variables** (optional):
+- `PORT` - Automatically set by Railway
+- `DEBUG` - Set to `true` for debug mode (default: `false`)
+
 ## Monitoring
 
 The app creates two log files:
