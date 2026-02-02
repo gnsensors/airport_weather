@@ -1,49 +1,109 @@
 # Railway Deployment Setup with PostgreSQL
 
+## Multi-Container Architecture
+
+This application uses **two separate containers** in Railway:
+
+```
+┌─────────────────────────────────────────┐
+│         Railway Private Network         │
+│                                         │
+│  ┌─────────────────┐  ┌──────────────┐ │
+│  │  Web App        │  │  PostgreSQL  │ │
+│  │  Container      │◄─┤  Container   │ │
+│  │  (Python/Flask) │  │  (Database)  │ │
+│  │  Port: $PORT    │  │  Port: 5432  │ │
+│  └────────┬────────┘  └──────────────┘ │
+│           │                             │
+└───────────┼─────────────────────────────┘
+            │
+            ▼
+    Public Internet
+  (Railway Domain)
+```
+
 ## Step-by-Step Deployment Instructions
 
-### 1. Create PostgreSQL Database
+### 1. Create PostgreSQL Database Container
 
 In your Railway project:
 
 1. Click **"+ New"** → **"Database"** → **"Add PostgreSQL"**
-2. Railway will automatically create a PostgreSQL database
-3. Railway will set these environment variables automatically:
-   - `DATABASE_URL` - Full PostgreSQL connection string
-   - `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`
+2. Railway deploys PostgreSQL in a **separate container**
+3. Railway automatically sets these environment variables:
+   - `DATABASE_URL` - Full connection string with internal IP
+     ```
+     postgresql://postgres:password@postgres.railway.internal:5432/railway
+     ```
+   - `PGHOST` - Internal hostname (e.g., `postgres.railway.internal`)
+   - `PGPORT` - Port `5432`
+   - `PGUSER`, `PGPASSWORD`, `PGDATABASE`
 
-### 2. Deploy Web Application
+### 2. Deploy Web Application Container
 
-The web app container is already configured to:
+Your web app is already configured to:
 - Connect to PostgreSQL using `DATABASE_URL` environment variable
+- Resolve internal Railway hostnames automatically
 - Initialize database tables automatically on startup
 - Fall back to SQLite if DATABASE_URL is not set (for local development)
 
-### 3. Container Networking
+### 3. Container Networking (Automatic)
 
-Railway automatically handles networking between containers:
-- The web app and database are in the same private network
-- The `DATABASE_URL` variable automatically includes the internal hostname
-- No additional networking configuration needed
+Railway handles all networking automatically:
 
-### 4. Verify Deployment
+**Private Network Communication:**
+- ✅ Web app and PostgreSQL are in the same **private network**
+- ✅ Communication uses **internal IPs** (not public internet)
+- ✅ `DATABASE_URL` includes internal hostname like `postgres.railway.internal`
+- ✅ Fast, secure, no egress charges
+
+**Public Access:**
+- ✅ Only the web app is exposed to the internet via Railway domain
+- ✅ PostgreSQL is **NOT** publicly accessible (secure by default)
+- ✅ Web app acts as the API gateway
+
+### 4. Verify Separate Containers
+
+In Railway dashboard, you should see **two separate services**:
+
+```
+Your Railway Project
+├── 🌐 airport_weather (Web App Container)
+│   ├── Status: Active
+│   ├── Domain: airportweather-production.up.railway.app
+│   └── Environment: DATABASE_URL → points to postgres container
+│
+└── 🗄️  PostgreSQL (Database Container)
+    ├── Status: Active
+    ├── Internal: postgres.railway.internal:5432
+    └── No public access (secure)
+```
+
+### 5. Verify Deployment
 
 After deployment:
 
-1. Check deployment logs for:
+1. **Check web app logs** for:
    ```
    ✅ Database initialized successfully
+   Connected to: postgresql://postgres:***@postgres.railway.internal:5432/railway
    [INFO] Listening at: http://0.0.0.0:XXXX
    ```
 
-2. Test the application:
+2. **Verify container networking**:
+   - Go to Railway → Web App → Variables
+   - Find `DATABASE_URL` - it should contain `postgres.railway.internal` (internal hostname)
+   - This confirms containers are communicating via private network
+
+3. **Test the application**:
    - Visit your Railway domain
    - Search for a city
    - Go to `/stats` to see analytics
 
-3. Check database:
+4. **Check database directly**:
    - Railway → PostgreSQL → Connect
    - Run: `\dt` to see tables (`visitors`, `weather_searches`)
+   - Run: `SELECT COUNT(*) FROM visitors;` to see visitor count
 
 ## Database Schema
 
