@@ -20,4 +20,5 @@ RUN mkdir -p /app/logs
 EXPOSE 5000
 
 # Run the application with gunicorn using PORT environment variable
-CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 30 weather_app:app
+# Use shell form to allow environment variable substitution
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 30 weather_app:app"]
