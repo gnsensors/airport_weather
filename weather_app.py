@@ -52,6 +52,11 @@ def log_ip_address(ip_address):
 
     return status
 
+@app.route('/health')
+def health():
+    """Health check endpoint for Railway"""
+    return {'status': 'healthy', 'service': 'airport-weather'}, 200
+
 @app.route('/')
 def index():
     # Get client IP address
