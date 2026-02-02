@@ -31,3 +31,10 @@ Thumbs.db
 
 # Environment variables
 .env
+
+# Local database (SQLite fallback)
+*.db
+weather.db
+
+# Railway
+.railway/
