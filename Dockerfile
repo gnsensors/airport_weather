@@ -19,5 +19,5 @@ RUN mkdir -p /app/logs
 # Expose port (Railway will set PORT env variable)
 EXPOSE 5000
 
-# Run the application with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "30", "weather_app:app"]
+# Run the application with gunicorn using PORT environment variable
+CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 30 weather_app:app
